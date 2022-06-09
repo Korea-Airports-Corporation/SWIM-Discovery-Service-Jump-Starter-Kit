@@ -34,8 +34,8 @@ async function getDiscoveryService (){
 	
     for(let index in discoveryServicesList){
         if(discoveryServicesList[index].isEnabled===true){
-	   if(discoveryServicesList[index].endPoint==='http://112.172.247.116:8002/smxs'){
-	                discoveryServicesList[index].endPoint = 'http://192.168.1.112:8002/smxs';
+	   if(discoveryServicesList[index].endPoint==='http://swim-registry.kr:8001/smxs'){
+	                discoveryServicesList[index].endPoint = 'http://localhost:8001/smxs';
                                  }
             let url = discoveryServicesList[index].endPoint + '/discovery-service'; 
             let config = {
