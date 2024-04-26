@@ -1,6 +1,6 @@
+import * as fs from 'fs';
+import * as path from 'path';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-
-import { GraphQLClient, gql } from 'graphql-request'
 import { DiscoveryServiceDto } from './dto/discovery-service.dto';
 import { DiscoveryServiceFactory } from './entity/discovery-service.entity';
 import { DiscoveryServiceProviderFactory } from './entity/discovery-service-provider.entity';
@@ -16,304 +16,375 @@ import { ServiceWrapperDto } from './dto/service-wrapper.dto';
 import { ServicesFactory } from './entity/services.entity';
 import { ServiceFactory } from './entity/service.entity';
 import { ProfileFactory } from './entity/profile.entity';
-import graphQLConfig from '../config/graphql.json'
-const graphQLNoAuthClient = new GraphQLClient(graphQLConfig.url)
-
-import { BASIC_URL } from '../config/smxs.json'
 import { PeersWrapperDto } from './dto/peers-wrapper';
+// Uncomment this line to import GraphQL
+// import { GraphQLClient, gql } from 'graphql-request';
 
 @Injectable()
 export class SmxsService {
 
   async getDiscoveryService(): Promise<DiscoveryServiceDto> {
+    // Sample code to create GraphQLClient without authorization (jwt token) 
+    /*
+      const graphQLClient = new GraphQLClient(YOUR_GRAPHQL_SERVER);
+    */
 
-    const queryKacDiscoveryService = gql`
-    {
-      kacDiscoveryService{
-        endPoint,
-        name,
-        description,
-        version,
-        seeAlso,
+    /* Sample query code to GraphQLServer 
+      const queryDiscoveryService = gql`
+      {
+        discoveryService{
+          endPoint,
+          name,
+          description,
+          version,
+          seeAlso,
+        }
+      }`
+      
+      const queryDiscoveryServiceProvider = gql`
+      {
+        discoveryServiceProvider{
+          name,
+          description,
+          webPage
+        }
+      }`
+
+      const queryDiscoveryServiceProviderContact = gql`
+      {
+        discoveryServiceProviderContact{
+          name,
+          function,
+          email
+        }
+      }`
+
+      const queryDiscoveryServiceOperations = gql`
+      {
+        discoveryServiceOperations{
+          name,
+          securityConstraint
+        }
+      }`
+
+      try {
+        const { discoveryService } = await graphQLClient.request(queryDiscoveryService);
+        const { discoveryServiceProvider } = await graphQLClient.request(queryDiscoveryServiceProvider);
+        const { discoveryServiceProviderContact } = await graphQLClient.request(queryDiscoveryServiceProviderContact);
+        const { discoveryServiceOperations } = await graphQLClient.request(queryDiscoveryServiceOperations);      
+      } catch (error){
+        console.log(error);
       }
-    }`
-    
-    const queryKacDiscoveryServiceProvider = gql`
-    {
-      kacDiscoveryServiceProvider{
-        name,
-        description,
-        webPage
-      }
-    }`
+    */
 
-    const queryKacDiscoveryServiceProviderContact = gql`
-    {
-      kacDiscoveryServiceProviderContact{
-        name,
-        function,
-        email
-      }
-    }`
+    // Import Sample Data from File
+    const discoveryServicePath = path.resolve(__dirname, './sample/discoveryService/discoveryService.json');
+    const discoveryServiceProviderPath = path.resolve(__dirname, './sample/discoveryService/provider.json');
+    const discoveryServiceProviderContactPath = path.resolve(__dirname, './sample/discoveryService/providerContact.json');
+    const discoveryServiceOperationsPath = path.resolve(__dirname, './sample/discoveryService/operations.json');
+    const discoveryService = JSON.parse(fs.readFileSync(discoveryServicePath,'utf-8'));
+    const discoveryServiceProvider = JSON.parse(fs.readFileSync(discoveryServiceProviderPath,'utf-8'));
+    const discoveryServiceProviderContact = JSON.parse(fs.readFileSync(discoveryServiceProviderContactPath,'utf-8'));
+    const discoveryServiceOperations = JSON.parse(fs.readFileSync(discoveryServiceOperationsPath,'utf-8'));
 
-    const queryKacDiscoveryServiceOperations = gql`
-    {
-      kacDiscoveryServiceOperations{
-        name,
-        securityConstraint
-      }
-    }`
+    // Generate Return Data
+    const discoveryServiceProviderContactFactory = new DiscoveryServiceProviderContactFactory();
+    discoveryServiceProviderContactFactory.setName(discoveryServiceProviderContact.name);
+    discoveryServiceProviderContactFactory.setEmail(discoveryServiceProviderContact.function);
+    discoveryServiceProviderContactFactory.setFunction(discoveryServiceProviderContact.email);
 
-    let { kacDiscoveryService } = await graphQLNoAuthClient.request(queryKacDiscoveryService);
-    let { kacDiscoveryServiceProvider } = await graphQLNoAuthClient.request(queryKacDiscoveryServiceProvider);
-    let { kacDiscoveryServiceProviderContact } = await graphQLNoAuthClient.request(queryKacDiscoveryServiceProviderContact);
-    let { kacDiscoveryServiceOperations } = await graphQLNoAuthClient.request(queryKacDiscoveryServiceOperations);
+    const discoveryServiceProviderFactory = new DiscoveryServiceProviderFactory();    
+    discoveryServiceProviderFactory.setName(discoveryServiceProvider.name);
+    discoveryServiceProviderFactory.setDescription(discoveryServiceProvider.description);
+    discoveryServiceProviderFactory.setWebPage(discoveryServiceProvider.webPage);
+    discoveryServiceProviderFactory.setPointOfContact(discoveryServiceProviderContactFactory.getDiscoveryServiceProviderContactData());
 
-
-    let kacDiscoveryServiceProviderContactFactory = new DiscoveryServiceProviderContactFactory();
-    kacDiscoveryServiceProviderContactFactory.setName(kacDiscoveryServiceProviderContact.name);
-    kacDiscoveryServiceProviderContactFactory.setEmail(kacDiscoveryServiceProviderContact.function);
-    kacDiscoveryServiceProviderContactFactory.setFunction(kacDiscoveryServiceProviderContact.email);
-
-    let kacDiscoveryServiceProviderFactory = new DiscoveryServiceProviderFactory();    
-    kacDiscoveryServiceProviderFactory.setName(kacDiscoveryServiceProvider.name);
-    kacDiscoveryServiceProviderFactory.setDescription(kacDiscoveryServiceProvider.description);
-    kacDiscoveryServiceProviderFactory.setWebPage(kacDiscoveryServiceProvider.webPage);
-    kacDiscoveryServiceProviderFactory.setPointOfContact(kacDiscoveryServiceProviderContactFactory.getDiscoveryServiceProviderContactData());
-
-    let kacDiscoveryServiceOperationsFactory = new DiscoveryServiceOperationsFactory();    
-    for(let i in kacDiscoveryServiceOperations){
-      kacDiscoveryServiceOperationsFactory.setValue(kacDiscoveryServiceOperations[i].name,kacDiscoveryServiceOperations[i].securityConstraint);
+    const discoveryServiceOperationsFactory = new DiscoveryServiceOperationsFactory();    
+    for(let i in discoveryServiceOperations){
+      discoveryServiceOperationsFactory.setValue(discoveryServiceOperations[i].name, discoveryServiceOperations[i].securityConstraint);
     }
 
-    let kacDiscoveryServiceFactory = new DiscoveryServiceFactory();
-    kacDiscoveryServiceFactory.setId(kacDiscoveryService.endPoint);
-    kacDiscoveryServiceFactory.setName(kacDiscoveryService.name);
-    kacDiscoveryServiceFactory.setProvider(kacDiscoveryServiceProviderFactory.getDiscoveryServiceProviderData());
-    kacDiscoveryServiceFactory.setDescription(kacDiscoveryService.description);
-    kacDiscoveryServiceFactory.setVersion(kacDiscoveryService.version);
-    kacDiscoveryServiceFactory.setOperations(kacDiscoveryServiceOperationsFactory.getDiscoveryServiceOperationData());
-    kacDiscoveryServiceFactory.setSeeAlso(kacDiscoveryService.seeAlso);
+    const discoveryServiceFactory = new DiscoveryServiceFactory();
+    discoveryServiceFactory.setId(discoveryService.endPoint);
+    discoveryServiceFactory.setName(discoveryService.name);
+    discoveryServiceFactory.setProvider(discoveryServiceProviderFactory.getDiscoveryServiceProviderData());
+    discoveryServiceFactory.setDescription(discoveryService.description);
+    discoveryServiceFactory.setVersion(discoveryService.version);
+    discoveryServiceFactory.setOperations(discoveryServiceOperationsFactory.getDiscoveryServiceOperationData());
+    discoveryServiceFactory.setSeeAlso(discoveryService.seeAlso);
 
-    return kacDiscoveryServiceFactory.getDiscoveryServiceData();
+    return discoveryServiceFactory.getDiscoveryServiceData();
   }
 
   async getPeers(): Promise<PeersWrapperDto> {
+    // Sample code to create GraphQLClient without authorization (jwt token) 
+    /*
+      const graphQLClient = new GraphQLClient(YOUR_GRAPHQL_SERVER);
+    */
 
-    const query = gql`
-    {
-      discoveryServices {
-        name,
-        isEnabled,
-        endPoint,
-        serviceId
+    /* Sample query code to GraphQLServer 
+      const query = gql`
+      {
+        discoveryServices {
+          name,
+          isEnabled,
+          endPoint,
+          serviceId
+        }
+      }`
+      try {
+        const { discoveryServices } = await graphQLClient.request(query);
+      } catch (error){
+        console.log(error);
       }
-    }`
 
-    let { discoveryServices } = await graphQLNoAuthClient.request(query);
+    */
+
+    // Import Sample Data from File
+    const discoveryServicesPath = path.resolve(__dirname, './sample/peers/discoveryServices.json');
+    const discoveryServices = JSON.parse(fs.readFileSync(discoveryServicesPath,'utf-8'));
+
+    // Generate Return Data
     let peers : PeersDto[] = new Array();
     
     for(let index in discoveryServices) {
-      let factory = new PeersFactory();
-      factory.setServiceId(discoveryServices[index]['serviceId']);
-      factory.setEndpoint(discoveryServices[index]['endPoint']);
-      peers.push(factory.getPeersData())
-
-      if(discoveryServices[index]['isSds'] === true){
-
-      }
+      const peersFactory = new PeersFactory();
+      peersFactory.setServiceId(discoveryServices[index]['serviceId']);
+      peersFactory.setEndpoint(discoveryServices[index]['endPoint']);
+      peers.push(peersFactory.getPeersData())
     }
-    let wrapper = new PeersWrapperDto();
-    wrapper['peers'] = peers; 
 
-    return wrapper;
+    let peersWrapper = new PeersWrapperDto();
+    peersWrapper['peers'] = peers; 
 
+    return peersWrapper;
   }
 
   async getServices( serviceCategory? : string, interfaceType? : string, availabilityStatus? : string): Promise<ServicesWrapperDto> {
+    // Sample code to create GraphQLClient without authorization (jwt token) 
+    /*
+      const graphQLClient = new GraphQLClient(YOUR_GRAPHQL_SERVER);
+    */ 
+   
+    /* Sample query code with parameters to GraphQLServer 
+      let filter = ``;
 
-    let filter = ``;
-
-    if(serviceCategory === '' && interfaceType === '' && availabilityStatus === '') {
-    } else {
-      filter = `(where :`;  
-    }
-
-    if(serviceCategory!=='') {
-      let values = serviceCategory.split(',');
-      filter = filter + `{category:"` + values + `"`;
-    }
-
-    if(interfaceType!=='') {
-      let values = interfaceType.split(',');
-
-      if(filter === `(where :`) {
-        filter = filter +  `{networkInterface:"` + values + `"`;
+      if(serviceCategory === '' && interfaceType === '' && availabilityStatus === '') {
       } else {
-        filter = filter + `,networkInterface:"` + values + `"`;
+        filter = `(where :`;  
       }
-    }
 
-    if(availabilityStatus!=='') {
-      let values = availabilityStatus.split(',');
-
-      if(filter === `(where :`) {
-        filter = filter + `{lifecycleInformation:"` + values + `"`;
-      } else {
-        filter = filter + `,lifecycleInformation:"` + values + `"`;
+      if(serviceCategory!=='') {
+        let values = serviceCategory.split(',');
+        filter = filter + `{category:"` + values + `"`;
       }
-    }
 
-    if (filter ===``){
-      filter =  `(where : {status : "approve"})`
-    } else {
-      filter = filter +`, status : "approve"})`; 
-    }
-    
-    const query = gql`
-    {
-      services ` + filter + ` {
-        serviceName,
-        briefDescription,
-        lifecycleInformation,
-        category,
-        networkInterface,
-        identifier
+      if(interfaceType!=='') {
+        let values = interfaceType.split(',');
+
+        if(filter === `(where :`) {
+          filter = filter +  `{networkInterface:"` + values + `"`;
+        } else {
+          filter = filter + `,networkInterface:"` + values + `"`;
+        }
       }
-    }`;
 
-    try {
-      let { services } = await graphQLNoAuthClient.request(query);
-      let list : ServicesDto[] = new Array();
+      if(availabilityStatus!=='') {
+        let values = availabilityStatus.split(',');
+
+        if(filter === `(where :`) {
+          filter = filter + `{lifecycleInformation:"` + values + `"`;
+        } else {
+          filter = filter + `,lifecycleInformation:"` + values + `"`;
+        }
+      }
       
-      for(let index in services) {
+      const query = gql`
+      {
+        services ` + filter + ` {
+          serviceName,
+          briefDescription,
+          lifecycleInformation,
+          category,
+          networkInterface,
+          identifier
+        }
+      }`;
+
+      try {
+        const { services } = await graphQLClient.request(query);
+      } catch (error){
+        console.log(error);
+      }
+    */
+
+    // Import Sample Data from File
+    const servicesPath = path.resolve(__dirname, './sample/services/services.json');
+    const services = JSON.parse(fs.readFileSync(servicesPath,'utf-8'));
+
+    // Generate Return Data
+    let list : ServicesDto[] = new Array();
+    
+    for(let index in services) {
+      //Check Filters
+      let isFiltered = true; 
+      
+      if(serviceCategory){
+        if(!serviceCategory.split(',').includes(services[index]['category'])){
+          isFiltered = false; 
+        }
+      }
+
+      if(interfaceType){
+        if(!interfaceType.split(',').includes(services[index]['networkInterface'])){
+          isFiltered = false; 
+        }
+      }
+
+      if(availabilityStatus){
+        if(!availabilityStatus.split(',').includes(services[index]['lifecycleInformation'])){
+          isFiltered = false; 
+        }
+      }
+
+      if(isFiltered){
         let factory = new ServicesFactory();
-        
-        factory.setId(BASIC_URL+services[index]['identifier']);
+      
+        factory.setId("http://swim-registry.kr/swim-service-description/" + services[index]['identifier']);
         factory.setName(services[index]['serviceName']);
         factory.setDescription(services[index]['briefDescription']);
-
+  
         if(services[index]['category']) {
           factory.setServiceCategory(services[index]['category']);
         }
-
+  
         if(services[index]['lifecycleInformation']) {
           factory.setServiceAvailabilityStatus(services[index]['lifecycleInformation']);
         } 
-
+  
         if(services[index]['networkInterface']) {
           factory.setInterfaceType(services[index]['networkInterface']);
         }
-
+  
         list.push(factory.getServicesData());
-        
-      }
-      let wrapper = new ServicesWrapperDto();
-      wrapper.services = list; 
-      return wrapper;
-
-    } catch (error){
-      console.log(error);
-      if(JSON.stringify(error).includes('Invalid token')) {
-        throw new UnauthorizedException('Invalid credentials');
       }
     }
+
+    let wrapper = new ServicesWrapperDto();
+    wrapper.services = list; 
+    return wrapper;
   }
 
-  async getService(token : string, identifier : string): Promise<ServiceWrapperDto> {
-     
-    const graphQLAuthClient = new GraphQLClient(graphQLConfig.url, {
+  //Uncomment this line if you want to check jwt token
+  //async getService(token : string, identifier : string): Promise<ServiceWrapperDto> {
+  async getService(identifier : string): Promise<ServiceWrapperDto> {
+    // Sample code to create GraphQLClient with authorization (jwt token) 
+    /*
+    const graphQLClient = new GraphQLClient(YOUR_GRAPHQL_SERVER, {
         headers: {
           authorization: 'Bearer ' + token,
         },
     });
+    */
 
-    let filter = `(where : {identifier:"` + identifier + `", status:"approve"})`;
+    /* Sample query code with parameters to GraphQLServer 
+      let filter = `(where : {identifier:"` + identifier + `"})`;
 
-    const query = gql`
-    {
-      services ` + filter + ` {
-        serviceName,
-        briefDescription,
-        lifecycleInformation,
-        category,
-        serviceVersion,
-        networkInterface,
-        providerOrganization,
-        providerOrganizationWebpage,
-        providerOrganizationDescription,
-        providerPointOfContact,
-        operation,
-        identifier
+      const query = gql`
+      {
+        services ` + filter + ` {
+          serviceName,
+          briefDescription,
+          lifecycleInformation,
+          category,
+          serviceVersion,
+          networkInterface,
+          providerOrganization,
+          providerOrganizationWebpage,
+          providerOrganizationDescription,
+          providerPointOfContact,
+          operation,
+          identifier
+        }
+      }`;
+
+      try {
+        const { services } = await graphQLClient.request(query);
+      } catch (error){
+        console.log(error);
       }
-    }`;
+    */
     
-    try {
+    // Import Sample Data from File
+    const servicesPath = path.resolve(__dirname, './sample/services/services.json');
+    const services = JSON.parse(fs.readFileSync(servicesPath,'utf-8'));
 
-      let { services } = await graphQLNoAuthClient.request(query);
-  
-      let profileFactory = new ProfileFactory();
-
-      profileFactory.setServideId(BASIC_URL + services[0].identifier);
- 
-      profileFactory.setName(services[0].serviceName);
-
-      if(services[0].briefDescription){
-        profileFactory.setDescription(services[0].briefDescription);
-      } 
-
-      profileFactory.setVersion(services[0].serviceVersion);
-      profileFactory.setProviderName(services[0].providerOrganization);
-      profileFactory.setProviderDescription(services[0].providerOrganizationDescription);
-
-      if(services[0].providerOrganizationWebpage){
-        profileFactory.setProviderWebpage(services[0].providerOrganizationWebpage);
-      }
-
-      profileFactory.setProviderPointOfContactName(services[0].providerPointOfContact.name);
-
-      if(services[0].providerPointOfContact.phone){
-        profileFactory.setProviderPointOfContactPhoneNumber(services[0].providerPointOfContact.phone);
-      }
-
-      profileFactory.setProviderPointOfContactEmail(services[0].providerPointOfContact.email);
-      profileFactory.setProviderPointOfContactFunction(services[0].providerPointOfContact.function);
-
-      if(services[0]['category']) {
-        profileFactory.setServiceCategory(services[0]['category']);
-      }
-
-      if(services[0]['lifecycleInformation']) {
-        profileFactory.setServiceAvailabilityStatus(services[0]['lifecycleInformation']);
-      } 
-
-      if(services[0]['networkInterface']) {
-        profileFactory.setInterfaceType(services[0]['networkInterface']);
-      }
-
-      if(services[0]['operation']) {
-        profileFactory.setFunction(services[0]['operation']);
-      }
-
-      let profile : ProfileDto = profileFactory.getProfileData();
-
-      let serviceFactory = new ServiceFactory();
-
-      serviceFactory.setServideId(BASIC_URL + services[0].identifier);
-      serviceFactory.setProfile(profile); 
-
-      let service : ServiceDto = serviceFactory.getServiceData(); 
-
-      let wrapper = new ServiceWrapperDto();
-      wrapper['service-description'] = service; 
-
-      return wrapper;
-
-    } catch (error){
-      console.log(error);
-      if(JSON.stringify(error).includes('Invalid token')) {
-        throw new UnauthorizedException('Invalid credentials');
+    // Generate Return Data
+    let targetService = null; 
+    for (let i in services){
+      if(identifier.match(services[i].identifier)){
+        targetService = services[i]; 
+        break;
       }
     }
+    
+    if(!targetService) return null; 
+
+    let profileFactory = new ProfileFactory();
+
+    profileFactory.setServideId("http://swim-registry.kr/swim-service-description/" + targetService.identifier);
+
+    profileFactory.setName(targetService.serviceName);
+
+    if(targetService.briefDescription){
+      profileFactory.setDescription(targetService.briefDescription);
+    } 
+
+    profileFactory.setVersion(targetService.serviceVersion);
+    profileFactory.setProviderName(targetService.providerOrganization);
+    profileFactory.setProviderDescription(targetService.providerOrganizationDescription);
+
+    if(targetService.providerOrganizationWebpage){
+      profileFactory.setProviderWebpage(targetService.providerOrganizationWebpage);
+    }
+
+    profileFactory.setProviderPointOfContactName(targetService.providerPointOfContact.name);
+
+    if(targetService.providerPointOfContact.phone){
+      profileFactory.setProviderPointOfContactPhoneNumber(targetService.providerPointOfContact.phone);
+    }
+
+    profileFactory.setProviderPointOfContactEmail(targetService.providerPointOfContact.email);
+    profileFactory.setProviderPointOfContactFunction(targetService.providerPointOfContact.function);
+
+    if(targetService['category']) {
+      profileFactory.setServiceCategory(targetService['category']);
+    }
+
+    if(targetService['lifecycleInformation']) {
+      profileFactory.setServiceAvailabilityStatus(targetService['lifecycleInformation']);
+    } 
+
+    if(targetService['networkInterface']) {
+      profileFactory.setInterfaceType(targetService['networkInterface']);
+    }
+
+    if(targetService['operation']) {
+      profileFactory.setFunction(targetService['operation']);
+    }
+
+    let profile : ProfileDto = profileFactory.getProfileData();
+
+    let serviceFactory = new ServiceFactory();
+
+    serviceFactory.setServiceId("http://swim-registry.kr/swim-service-description/"  + targetService.identifier);
+    serviceFactory.setProfile(profile); 
+
+    let service : ServiceDto = serviceFactory.getServiceData(); 
+
+    let wrapper = new ServiceWrapperDto();
+    wrapper['service-description'] = service; 
+
+    return wrapper;
   }
 }

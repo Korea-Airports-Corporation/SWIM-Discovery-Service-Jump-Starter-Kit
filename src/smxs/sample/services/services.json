@@ -1,0 +1,96 @@
+[
+  {
+    "serviceName": "SWIM Metadata Exchange Service (SMXS)",
+    "briefDescription": "The SWIM Metadata Exchange Service (SMXS) provides metadata of SWIM services registered in the ROK SWIM testbed. ",
+    "lifecycleInformation": "prospective",
+    "category": "discovery",
+    "serviceVersion": "0.2.0",
+    "networkInterface": "resource_oriented",
+    "providerOrganization": "Korea Airports Corporation ",
+    "providerOrganizationWebpage": "www.airport.co.kr",
+    "providerOrganizationDescription": "Korea Airports Corporation(KAC) operates 14 airports in the Republic of Korea, Navaids, two ATCs, and KAC has been conducting the ROK SWIM project since 2016",
+    "providerPointOfContact": {
+      "name": "SEHWANHAN",
+      "function": "JUNIOR RESEARCHER",
+      "email": "hsh91@airport.co.kr",
+      "phone": "+82-2-2660-4376"
+    },
+    "operation": [
+      {
+        "name": "GetDiscoveryService",
+        "description": "This operation provides information about discovery service",
+        "synchronicity": "asynchronous",
+        "output": "JSON",
+        "messageExchangePattern": "request/reply",
+        "message": "GetDiscoveryServiceRequest, GetDiscoveryServiceReply"
+      },
+      {
+        "name": "GetPeers",
+        "description": "This operation provides a list of inter-connected discovery services",
+        "synchronicity": "asynchronous",
+        "output": "JSON",
+        "messageExchangePattern": "request/reply",
+        "message": "GetPeersRequest, GetPeersReply"
+      },
+      {
+        "name": "GetServices",
+        "description": "This operation provides a list of SWIM services or metadata of a certain SWIM service in accordance with user's query",
+        "synchronicity": "asynchronous",
+        "output": "JSON",
+        "messageExchangePattern": "request/reply",
+        "message": "GetServicesRequest, GetServicesReply"
+      }
+    ],
+    "identifier": "smxs-0.2.0"
+  },
+  {
+    "serviceName": "Surveillance Information (ADS-B) Publication Service (ASTERIX)",
+    "briefDescription": "Surveillance Information (ADS-B) Publication Service (ASTERIX) for the SWIM over CRV demonstration and surveillance data over SWIM trial",
+    "lifecycleInformation": "prospective",
+    "category": "surveillance",
+    "serviceVersion": "0.0.1",
+    "providerOrganization": "Korea Airports Corporation",
+    "networkInterface": "message_oriented",
+    "geographicalExtentOfService": "NIL",
+    "providerPointOfContact": {
+        "name": "SEHWANHAN",
+        "function": "SENIOR RESEARCH ENGINEER",
+        "email": "hsh91@airport.co.kr",
+        "phone": "+82-2-2660-4376"
+    },
+    "additionalServiceDescription": "<p>NIL</p>",
+    "accessRestriction": "ANSP,Airport Operator,Airlines",
+    "exchangeModels": "BINARY (ASTERIX CAT. 21)",
+    "serviceFunctions": "NIL",
+    "sourcesOfInforamtion": "NIL",
+    "supportAvailability": "For any questions or troubleshooting for this service, contact the point of contact",
+    "serviceValidation": "SELF VALIDATION : KAC R&D Lab. tested the service in accordance with its QMS based requirements. ",
+    "operation": [
+        {
+            "name": "GetSurveillanceData",
+            "description": "This operation provides surveillance data in ASTERIX CAT 21.",
+            "synchronicity": "asynchronous",
+            "output": "BINARY (ASTERIX CAT. 21)",
+            "messageExchangePattern": "publish/subscribe",
+            "message": "PublishSurveillanceData"
+        }
+    ],
+    "message": [
+        {
+            "name": "PublishSurveillanceData",
+            "description": "Publish surveillance data to subscriber",
+            "direction": "out",
+            "operation": "GetSurveillanceData"
+        }
+    ],
+    "qualityOfService": "<p>{\"availability\":\"NIL\",\"capacity\":\"NIL\",\"time behavior\":\"NIL\",\"recoverability\":\"NIL\",\"integrity\":\"NIL\",\"confidentiality\":\"NIL\"}</p>",
+    "messageHeader": "<p>{</p><p>&nbsp;&nbsp;\"APAC_CATEGORY\":\"ASTERIX\",</p><p>&nbsp;&nbsp;\"APAC_CATEGORY_VERSION\":\"ASTERIX_CAT021\",</p><p>&nbsp;&nbsp;\"APAC_MESSAGE_TYPE\":\"TRACK_RAW\",</p><p>&nbsp;&nbsp;\"APAC_RECIPIENT_LIST\":\"ZB_ATMB,VH_HKCAD,RJ_JCAB,WM_CAAM,WS_CAAS,VT_AEROTHAI,WI_CAI,VL_LPDR,NZ_AIRWAYS,OP_CAAPK,RP_CAAP,RJ_JAL\",</p><p>&nbsp;&nbsp;\"APAC_SOURCE\":\"RK_KAC\",</p><p>&nbsp;&nbsp;\"APAC_SYSTEM\":\"KAC\",</p><p>&nbsp;&nbsp;\"APAC_TIMESTAMP\":\"KAC_OUT:1711692936470\"</p><p>}</p>",
+    "filteringAvailable": false,
+    "providerOrganizationDescription": "Korea Airports Corporation(KAC) operates 14 airports in the Republic of Korea, Navaids, two ATCs, and KAC has been conducting the ROK SWIM project since 2016",
+    "protocol": "<p>AMQP 1.0, ASTERIX</p>",
+    "messageExchangePattern": "publish_subscribe",
+    "providerOrganizationWebpage": "www.airport.co.kr",
+    "identifier": "SIPSA0.0.10.0.1",
+    "status": "approve"
+}
+]

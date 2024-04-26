@@ -1,4 +1,14 @@
 {
   "collection": "@nestjs/schematics",
-  "sourceRoot": "src"
+  "sourceRoot": "src",
+  "compilerOptions": {
+    "deleteOutDir": true,
+    "assets": [
+      {
+        "include": "./smxs/sample",
+        "outDir": "dist/",
+        "watchAssets": true
+      }
+    ]
+  }
 }

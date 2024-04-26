@@ -1,0 +1,14 @@
+[
+    {
+        "name": "GetDiscoveryService",
+        "securityConstraint": null
+    },
+    {
+        "name": "GetPeers",
+        "securityConstraint": null
+    },
+    {
+        "name": "GetServices",
+        "securityConstraint": "HTTP Bearer"
+    }
+]

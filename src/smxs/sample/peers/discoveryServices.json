@@ -1,0 +1,17 @@
+[
+    {
+      "name": "SWIM Discovery Service",
+      "endPoint": "http://swim-registry.kr:8001/smxs",
+      "serviceId": "http://swim-registry.kr:8000/swim-service-description/smxs-0.2.0"
+    },
+    {
+      "name": "NSRR SMXS",
+      "endPoint": " https://nsrr.faa.gov/smxs",
+      "serviceId": " https://nsrr.faa.gov/smxs"
+    },
+    {
+      "name": "ENRI SMXS",
+      "endPoint": "http://18.224.226.206:8082/smxs",
+      "serviceId": "http://18.224.226.206:8082/smxs"
+    }
+]

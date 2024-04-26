@@ -4,7 +4,7 @@ import { GroundingDto } from '../dto/grounding.dto';
 import { ServiceDto } from '../dto/service.dto';
 
 interface IServiceFactory {
-    setServideId(value: string) : void;
+    setServiceId(value: string) : void;
     setModel(value: ModelDto) : void;
     setProfile(value: ProfileDto) : void;
     setGrounding(value: GroundingDto) : void;
@@ -20,7 +20,7 @@ export class ServiceFactory implements IServiceFactory {
     
     constructor() {}
 
-    setServideId(value) : void {
+    setServiceId(value) : void {
         this._serviceId = value;
     };
 

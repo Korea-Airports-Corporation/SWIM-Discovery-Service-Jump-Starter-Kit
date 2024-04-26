@@ -1,0 +1,7 @@
+{
+    "endPoint":"http://swim-registry.kr:8001/smxs",
+    "name":"SWIM Metadata Exchange Service (SMXS)",
+    "description":"This service is provided by the Korea Airports Corporation(KAC) to enable service discovery that allows consumers to discover metadata of SWIM services",
+    "version":"0.2.0",
+    "seeAlso":"http://swim-registry.kr:8000/swim-service-description/smxs-0.2.0"
+}
